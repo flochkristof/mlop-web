@@ -1,5 +1,4 @@
 FROM node:lts AS builder
-# FROM node:18-alpine AS builder
 WORKDIR /app
 
 ARG VITE_IS_DOCKER

@@ -263,8 +263,8 @@ export const modelGraphNode = z.object({
   node_type: z.nativeEnum(RunGraphNodeType).optional(),
   inst_id: z.string().optional(),
   args: z.array(z.any()).optional(),
-  kwargs: z.record(z.any()).optional(),
-  params: z.record(z.array(z.number())).optional(),
+  kwargs: z.record(z.string(), z.any()).optional(),
+  params: z.record(z.string(), z.array(z.number())).optional(),
   edges: z.array(z.array(z.string())).optional(),
 });
 
@@ -307,9 +307,9 @@ router.post(
           nodeId: node.node_id,
           nodeType: node.node_type,
           instId: node.inst_id,
-          args: node.args,
-          kwargs: node.kwargs,
-          params: node.params,
+          args: node.args as Prisma.InputJsonValue | undefined,
+          kwargs: node.kwargs as Prisma.InputJsonValue | undefined,
+          params: node.params as Prisma.InputJsonValue | undefined,
         },
       });
 

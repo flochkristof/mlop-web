@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { DataTable } from "./runs-table/data-table";
-import { columns } from "./runs-table/columns";
 import type { inferOutput } from "@trpc/tanstack-react-query";
 import type { trpc } from "@/utils/trpc";
 
@@ -15,6 +14,11 @@ interface RunsTableContainerProps {
   selectedRunsWithColors: Record<string, { run: Run; color: string }>;
   runColors: Record<string, string>;
   defaultRowSelection: Record<number, boolean>;
+  runCount: number;
+  isLoading: boolean;
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 /**
@@ -30,6 +34,11 @@ export function RunsTableContainer({
   selectedRunsWithColors,
   runColors,
   defaultRowSelection,
+  runCount,
+  isLoading,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
 }: RunsTableContainerProps) {
   // Calculate current row selection based on actual selectedRunsWithColors
   // This ensures the table checkboxes stay in sync with the actual selected runs
@@ -52,15 +61,19 @@ export function RunsTableContainer({
   const memoizedDataTable = useMemo(
     () => (
       <DataTable
-        columns={columns({
-          orgSlug,
-          projectName,
-          onColorChange,
-          onSelectionChange,
-          runColors,
-        })}
-        data={runs ?? []}
+        runs={runs ?? []}
+        orgSlug={orgSlug}
+        projectName={projectName}
+        onColorChange={onColorChange}
+        onSelectionChange={onSelectionChange}
+        selectedRunsWithColors={selectedRunsWithColors}
+        runColors={runColors}
         defaultRowSelection={currentRowSelection}
+        runCount={runCount}
+        isLoading={isLoading}
+        fetchNextPage={fetchNextPage}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
       />
     ),
     [
@@ -72,6 +85,11 @@ export function RunsTableContainer({
       runColors,
       runs,
       currentRowSelection,
+      runCount,
+      isLoading,
+      fetchNextPage,
+      hasNextPage,
+      isFetchingNextPage,
     ],
   );
 

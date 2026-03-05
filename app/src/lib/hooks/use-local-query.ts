@@ -409,5 +409,5 @@ export const bustLocalCache = async (
   queryKey: TRPCQueryKey,
 ) => {
   const storageKey = stringifyQueryKey(queryKey);
-  await localCache.setData(storageKey, null);
+  await localCache.store.delete(storageKey);
 };

@@ -24,6 +24,7 @@ export interface LineData {
 interface LineChartProps extends React.HTMLAttributes<HTMLDivElement> {
   lines: LineData[];
   isDateTime?: boolean;
+  isBytes?: boolean;
   logXAxis?: boolean;
   logYAxis?: boolean;
   xlabel?: string;

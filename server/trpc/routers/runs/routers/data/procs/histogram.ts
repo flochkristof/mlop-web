@@ -17,7 +17,7 @@ const histogramSchema = z.object({
 const histogramDataRow = z.object({
   logName: z.string(),
   time: z.string().transform((str) => new Date(str + "Z")),
-  step: z.string().transform((str) => parseInt(str, 10)),
+  step: z.union([z.number(), z.string().transform((str) => parseInt(str, 10))]),
   histogramData: z.string().transform((str) => {
     const parsed = JSON.parse(str);
     return histogramSchema.parse(parsed);

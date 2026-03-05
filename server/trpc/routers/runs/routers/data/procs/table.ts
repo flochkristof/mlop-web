@@ -28,7 +28,7 @@ const tableSchema = z.object({
 const tableDataRow = z.object({
   logName: z.string(),
   time: z.string().transform((str) => new Date(str + "Z")),
-  step: z.string().transform((str) => parseInt(str, 10)),
+  step: z.union([z.number(), z.string().transform((str) => parseInt(str, 10))]),
   tableData: z.string().transform((str) => {
     const parsed = JSON.parse(str);
     return tableSchema.parse(parsed);

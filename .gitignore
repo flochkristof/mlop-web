@@ -4,6 +4,7 @@
 .DS_Store
 *.local
 *.log*
+*.tsbuildinfo
 
 node_modules
 dist/

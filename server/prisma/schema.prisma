@@ -9,10 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  // Direct URL is used for migrations
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_DIRECT_URL")
+  provider = "postgresql"
 }
 
 enum OrganizationRole {

@@ -132,7 +132,11 @@ export function UserDetails({ ...other }: UserDetailsProps): React.JSX.Element {
               <DropdownMenuItem
                 className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
                 onClick={async () => {
-                  await signOut(() => queryClient.invalidateQueries());
+                  try {
+                    await signOut(() => queryClient.invalidateQueries());
+                  } catch {
+                    // Even if the API call fails, clear local state and redirect
+                  }
                   window.location.href = "/";
                 }}
               >

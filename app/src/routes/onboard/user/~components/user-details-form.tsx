@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { queryClient, trpc } from "@/utils/trpc";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
+import { bustAuthCache } from "@/lib/auth/check";
 
 export type FormData = {
   location: string;
@@ -30,8 +31,8 @@ const pageVariants = {
 };
 
 const pageTransition = {
-  type: "tween",
-  ease: "anticipate",
+  type: "tween" as const,
+  ease: "anticipate" as const,
   duration: 0.3,
 };
 const ONBOARDING_STEPS = [
@@ -106,6 +107,7 @@ export default function UserDetailsForm() {
         agreeToMarketing: formData.allowMarketing,
       });
 
+      await bustAuthCache();
       await queryClient.invalidateQueries();
 
       // toast.success("Thank you for your submission!");

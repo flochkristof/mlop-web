@@ -11,6 +11,8 @@ import { metricsCache } from "@/lib/db/index";
 import { useLineSettings, type LineChartSettings } from "../use-line-settings";
 import { smoothData } from "@/lib/math/smoothing";
 
+export const BYTES_LOGS: string[] = [];
+
 export type MetricDataPoint = {
   step: number;
   time: string;
