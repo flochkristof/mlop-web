@@ -42,8 +42,10 @@ WORKDIR /app
 COPY . .
 RUN corepack enable \
   && corepack prepare pnpm@10.9.0 --activate \
-  && pnpm install --config.only-built-dependencies='["@prisma/client","@prisma/engines","esbuild","prisma","sharp"]' \
-  && pnpm run build
+  && pnpm install --filter @mlop/server... --frozen-lockfile \
+  && pnpm --filter @mlop/server build
+
+WORKDIR /app/server
 
 ENV NODE_ENV=production
 ENV PORT=3001
