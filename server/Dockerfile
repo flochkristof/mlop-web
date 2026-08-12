@@ -8,7 +8,8 @@ COPY . .
 RUN corepack enable \
   && corepack prepare pnpm@10.9.0 --activate \
   && pnpm install --filter @mlop/server... --frozen-lockfile \
-  && STORAGE_ENDPOINT=http://build.invalid \
+  && IS_DOCKER=true \
+     STORAGE_ENDPOINT=http://build.invalid \
      STORAGE_ACCESS_KEY_ID=build-placeholder \
      STORAGE_SECRET_ACCESS_KEY=build-placeholder \
      STORAGE_BUCKET=build-placeholder \
