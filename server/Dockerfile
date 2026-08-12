@@ -2,48 +2,29 @@ FROM node:lts AS base
 RUN apt-get update && apt-get install -y libc6-dev && rm -rf /var/lib/apt/lists/*
 # RUN apk add --no-cache libc6-compat openssl
 
-ARG IS_DOCKER
-ARG STORAGE_ENDPOINT
-ARG STORAGE_ACCESS_KEY_ID
-ARG STORAGE_SECRET_ACCESS_KEY
-ARG STORAGE_BUCKET
-ARG CLICKHOUSE_URL
-ARG CLICKHOUSE_USER
-ARG CLICKHOUSE_PASSWORD
-ARG DATABASE_URL
-ARG DATABASE_DIRECT_URL
-ARG GITHUB_CLIENT_ID
-ARG GITHUB_CLIENT_SECRET
-ARG GOOGLE_CLIENT_ID
-ARG GOOGLE_CLIENT_SECRET
-ARG PUBLIC_URL
-ARG BETTER_AUTH_URL
-ARG BETTER_AUTH_SECRET
-ENV IS_DOCKER=${IS_DOCKER}
-ENV STORAGE_ENDPOINT=${STORAGE_ENDPOINT}
-ENV STORAGE_ACCESS_KEY_ID=${STORAGE_ACCESS_KEY_ID}
-ENV STORAGE_SECRET_ACCESS_KEY=${STORAGE_SECRET_ACCESS_KEY}
-ENV STORAGE_BUCKET=${STORAGE_BUCKET}
-ENV CLICKHOUSE_URL=${CLICKHOUSE_URL}
-ENV CLICKHOUSE_USER=${CLICKHOUSE_USER}
-ENV CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
-ENV DATABASE_URL=${DATABASE_URL}
-ENV DATABASE_DIRECT_URL=${DATABASE_DIRECT_URL}
-ENV GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-ENV GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
-ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-ENV PUBLIC_URL=${PUBLIC_URL}
-ENV BETTER_AUTH_URL=${BETTER_AUTH_URL}
-ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
-
 WORKDIR /app
 
 COPY . .
 RUN corepack enable \
   && corepack prepare pnpm@10.9.0 --activate \
   && pnpm install --filter @mlop/server... --frozen-lockfile \
-  && pnpm --filter @mlop/server build
+  && STORAGE_ENDPOINT=http://build.invalid \
+     STORAGE_ACCESS_KEY_ID=build-placeholder \
+     STORAGE_SECRET_ACCESS_KEY=build-placeholder \
+     STORAGE_BUCKET=build-placeholder \
+     CLICKHOUSE_URL=http://build.invalid \
+     CLICKHOUSE_USER=build-placeholder \
+     CLICKHOUSE_PASSWORD=build-placeholder \
+     DATABASE_URL=postgresql://build:build@build.invalid/build \
+     DATABASE_DIRECT_URL=postgresql://build:build@build.invalid/build \
+     GITHUB_CLIENT_ID=build-placeholder \
+     GITHUB_CLIENT_SECRET=build-placeholder \
+     GOOGLE_CLIENT_ID=build-placeholder \
+     GOOGLE_CLIENT_SECRET=build-placeholder \
+     PUBLIC_URL=http://build.invalid \
+     BETTER_AUTH_URL=http://build.invalid \
+     BETTER_AUTH_SECRET=build-placeholder \
+     pnpm --filter @mlop/server build
 
 WORKDIR /app/server
 
