@@ -9,14 +9,26 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "./env"; // Import the validated env
 
-// Initialize S3 client for Cloudflare R2 bucket
+const credentials = {
+  accessKeyId: env.STORAGE_ACCESS_KEY_ID,
+  secretAccessKey: env.STORAGE_SECRET_ACCESS_KEY,
+};
+const forcePathStyle = env.STORAGE_PUBLIC_ENDPOINT !== undefined;
+
+// Use the internal endpoint for server-side storage operations.
 const s3Client = new S3Client({
   region: "auto",
   endpoint: env.STORAGE_ENDPOINT,
-  credentials: {
-    accessKeyId: env.STORAGE_ACCESS_KEY_ID,
-    secretAccessKey: env.STORAGE_SECRET_ACCESS_KEY,
-  },
+  credentials,
+  forcePathStyle,
+});
+
+// Presigned URLs need an endpoint that is reachable by the browser.
+const publicS3Client = new S3Client({
+  region: "auto",
+  endpoint: env.STORAGE_PUBLIC_ENDPOINT ?? env.STORAGE_ENDPOINT,
+  credentials,
+  forcePathStyle,
 });
 
 /**
@@ -35,7 +47,7 @@ async function getS3Url(
       Key: key,
     });
 
-    const signedUrl = await getSignedUrl(s3Client, command, {
+    const signedUrl = await getSignedUrl(publicS3Client, command, {
       expiresIn: expiresIn,
     });
 

@@ -3,6 +3,7 @@ import { z } from "zod";
 const envSchema = z.object({
   // Storage
   STORAGE_ENDPOINT: z.string().url(),
+  STORAGE_PUBLIC_ENDPOINT: z.string().url().optional(),
   STORAGE_ACCESS_KEY_ID: z.string().min(1),
   STORAGE_SECRET_ACCESS_KEY: z.string().min(1),
   STORAGE_BUCKET: z.string().min(1),
