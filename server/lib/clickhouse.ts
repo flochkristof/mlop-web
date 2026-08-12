@@ -29,4 +29,15 @@ export class Clickhouse {
     });
     return result;
   }
+
+  // Statements that return no rows (DDL, ALTER ... DELETE mutations, ...)
+  async command(
+    query: string,
+    query_params: Record<string, unknown> | undefined
+  ) {
+    return await this.client.command({
+      query,
+      query_params,
+    });
+  }
 }

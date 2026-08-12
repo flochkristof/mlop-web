@@ -2,6 +2,9 @@ import {
   S3Client,
   GetObjectCommand,
   PutObjectCommand,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
+  type ListObjectsV2CommandOutput,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "./env"; // Import the validated env
@@ -52,6 +55,52 @@ export const getImageUrl = async (
 ) => {
   const key = `${tenantId}/${projectName}/${runId}/${logName}/${fileName}`;
   return await getS3Url(key);
+};
+
+/**
+ * Deletes every object stored under a run, i.e. all keys prefixed with
+ * `${tenantId}/${projectName}/${runId}/` (see getImageUrl for the key layout).
+ * @returns the number of objects deleted
+ */
+export const deleteRunFiles = async (
+  tenantId: string,
+  projectName: string,
+  runId: number | bigint
+) => {
+  const prefix = `${tenantId}/${projectName}/${runId}/`;
+  let continuationToken: string | undefined = undefined;
+  let deleted = 0;
+
+  do {
+    const listed: ListObjectsV2CommandOutput = await s3Client.send(
+      new ListObjectsV2Command({
+        Bucket: env.STORAGE_BUCKET,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+      })
+    );
+
+    const objects = (listed.Contents ?? [])
+      .map((object) => object.Key)
+      .filter((key): key is string => !!key)
+      .map((key) => ({ Key: key }));
+
+    if (objects.length > 0) {
+      await s3Client.send(
+        new DeleteObjectsCommand({
+          Bucket: env.STORAGE_BUCKET,
+          Delete: { Objects: objects, Quiet: true },
+        })
+      );
+      deleted += objects.length;
+    }
+
+    continuationToken = listed.IsTruncated
+      ? listed.NextContinuationToken
+      : undefined;
+  } while (continuationToken);
+
+  return deleted;
 };
 
 export async function uploadFileToR2(

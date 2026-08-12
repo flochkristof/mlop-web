@@ -36,6 +36,7 @@ import { DEFAULT_PAGE_SIZE } from "./config";
 interface DataTableProps {
   runs: Run[];
   orgSlug: string;
+  organizationId: string;
   projectName: string;
   onColorChange: (runId: string, color: string) => void;
   onSelectionChange: (runId: string, isSelected: boolean) => void;
@@ -52,6 +53,7 @@ interface DataTableProps {
 export function DataTable({
   runs,
   orgSlug,
+  organizationId,
   projectName,
   onColorChange,
   onSelectionChange,
@@ -100,12 +102,20 @@ export function DataTable({
     () =>
       columns({
         orgSlug,
+        organizationId,
         projectName,
         onColorChange,
         onSelectionChange,
         runColors,
       }),
-    [orgSlug, projectName, onColorChange, onSelectionChange, runColors],
+    [
+      orgSlug,
+      organizationId,
+      projectName,
+      onColorChange,
+      onSelectionChange,
+      runColors,
+    ],
   );
 
   // Initialize rowSelection with defaultRowSelection but keep it synced with incoming props

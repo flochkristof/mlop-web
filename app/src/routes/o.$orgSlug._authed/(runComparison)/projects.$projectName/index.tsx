@@ -126,6 +126,7 @@ function RouteComponent() {
             <DataTable
               runs={runs}
               orgSlug={organizationSlug}
+              organizationId={organizationId}
               projectName={projectName}
               onColorChange={handleColorChange}
               onSelectionChange={handleRunSelection}

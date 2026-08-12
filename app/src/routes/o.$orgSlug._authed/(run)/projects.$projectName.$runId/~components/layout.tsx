@@ -23,7 +23,9 @@ import {
   TooltipTrigger,
   UnstyledTooltipContent,
 } from "@/components/ui/tooltip";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Trash2 } from "lucide-react";
+import { useNavigate, useParams } from "@tanstack/react-router";
+import { DeleteRunDialog } from "@/components/core/runs/delete-run-dialog";
 
 type Run = inferOutput<typeof trpc.runs.get>;
 
@@ -115,6 +117,61 @@ const CancelRunButton = ({
   );
 };
 
+const DeleteRunButton = ({
+  organizationId,
+  orgSlug,
+  projectName,
+  runId,
+  runName,
+}: {
+  organizationId: string;
+  orgSlug: string;
+  projectName: string;
+  runId: string;
+  runName: string;
+}) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const navigate = useNavigate();
+
+  return (
+    <>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete Run
+          </Button>
+        </TooltipTrigger>
+        <UnstyledTooltipContent showArrow={false}>
+          <DocsTooltip
+            title="Delete Run"
+            iconComponent={<AlertTriangle className="h-4 w-4" />}
+            description="Permanently deletes the run together with all of its metrics, logs, media and files"
+          />
+        </UnstyledTooltipContent>
+      </Tooltip>
+      <DeleteRunDialog
+        organizationId={organizationId}
+        projectName={projectName}
+        runId={runId}
+        runName={runName}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onDeleted={() =>
+          navigate({
+            to: "/o/$orgSlug/projects/$projectName",
+            params: { orgSlug, projectName },
+          })
+        }
+      />
+    </>
+  );
+};
+
 export const Layout = ({
   children,
   run,
@@ -123,6 +180,9 @@ export const Layout = ({
   title,
   organizationId,
 }: LayoutProps) => {
+  // The run pages are all nested under /o/$orgSlug, so this is always set
+  const { orgSlug } = useParams({ strict: false });
+
   return (
     <RunsLayout>
       <PageLayout
@@ -144,7 +204,7 @@ export const Layout = ({
           </div>
         }
         headerRight={
-          <div>
+          <div className="flex items-center gap-2">
             {run?.status === "RUNNING" && (
               <CancelRunButton
                 organizationId={organizationId}
@@ -152,6 +212,13 @@ export const Layout = ({
                 runId={runId}
               />
             )}
+            <DeleteRunButton
+              organizationId={organizationId}
+              orgSlug={orgSlug ?? ""}
+              projectName={projectName}
+              runId={runId}
+              runName={run?.name ?? runId}
+            />
           </div>
         }
       >

@@ -8,6 +8,7 @@ type Run = inferOutput<typeof trpc.runs.list>["runs"][number];
 interface RunsTableContainerProps {
   runs: Run[];
   orgSlug: string;
+  organizationId: string;
   projectName: string;
   onColorChange: (runId: string, color: string) => void;
   onSelectionChange: (runId: string, isSelected: boolean) => void;
@@ -28,6 +29,7 @@ interface RunsTableContainerProps {
 export function RunsTableContainer({
   runs,
   orgSlug,
+  organizationId,
   projectName,
   onColorChange,
   onSelectionChange,
@@ -63,6 +65,7 @@ export function RunsTableContainer({
       <DataTable
         runs={runs ?? []}
         orgSlug={orgSlug}
+        organizationId={organizationId}
         projectName={projectName}
         onColorChange={onColorChange}
         onSelectionChange={onSelectionChange}
@@ -78,6 +81,7 @@ export function RunsTableContainer({
     ),
     [
       orgSlug,
+      organizationId,
       projectName,
       onColorChange,
       onSelectionChange,

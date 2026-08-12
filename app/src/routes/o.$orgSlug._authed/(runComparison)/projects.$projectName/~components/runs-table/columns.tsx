@@ -1,9 +1,18 @@
 import { Link } from "@tanstack/react-router";
 import type { ColumnDef, Row } from "@tanstack/react-table";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, MoreHorizontal, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { SELECTED_RUNS_LIMIT } from "./config";
 import { StatusIndicator } from "@/components/layout/dashboard/sidebar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DeleteRunDialog } from "@/components/core/runs/delete-run-dialog";
 import type { Run } from "../../~queries/list-runs";
 
 type RunId = string;
@@ -11,6 +20,7 @@ type RunColor = string;
 
 interface ColumnsProps {
   orgSlug: string;
+  organizationId: string;
   projectName: string;
   onSelectionChange: (runId: RunId, isSelected: boolean) => void;
   onColorChange: (runId: RunId, color: RunColor) => void;
@@ -45,8 +55,56 @@ function getRowRange<T>(rows: Array<Row<T>>, idA: string, idB: string) {
   return range;
 }
 
+function RunActionsCell({
+  run,
+  organizationId,
+  projectName,
+  onSelectionChange,
+}: {
+  run: Run;
+  organizationId: string;
+  projectName: string;
+  onSelectionChange: (runId: RunId, isSelected: boolean) => void;
+}) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-6 w-6 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete Run
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DeleteRunDialog
+        organizationId={organizationId}
+        projectName={projectName}
+        runId={run.id}
+        runName={run.name}
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        // Drop the deleted run from the comparison so it stops being charted
+        onDeleted={(runId) => onSelectionChange(runId, false)}
+      />
+    </>
+  );
+}
+
 export const columns = ({
   orgSlug,
+  organizationId,
   projectName,
   onSelectionChange,
   onColorChange,
@@ -161,6 +219,21 @@ export const columns = ({
           </div>
         );
       },
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="flex justify-end">
+          <RunActionsCell
+            run={row.original}
+            organizationId={organizationId}
+            projectName={projectName}
+            onSelectionChange={onSelectionChange}
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
     },
   ];
 };
