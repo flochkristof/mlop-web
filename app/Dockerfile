@@ -9,7 +9,9 @@ ENV VITE_ENV=${VITE_ENV}
 ENV VITE_SERVER_URL=${VITE_SERVER_URL}
 
 COPY . .
-RUN npm install -g pnpm && pnpm i && pnpm build
+RUN npm install -g pnpm@10.9.0 \
+  && pnpm install --config.only-built-dependencies='["esbuild"]' \
+  && pnpm build
 
 FROM nginx:stable-alpine
 COPY --from=builder /app/dist /usr/share/nginx/html

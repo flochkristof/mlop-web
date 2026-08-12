@@ -40,7 +40,10 @@ ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 WORKDIR /app
 
 COPY . .
-RUN corepack enable pnpm && pnpm i && pnpm run build
+RUN corepack enable \
+  && corepack prepare pnpm@10.9.0 --activate \
+  && pnpm install --config.only-built-dependencies='["@prisma/client","@prisma/engines","esbuild","prisma","sharp"]' \
+  && pnpm run build
 
 ENV NODE_ENV=production
 ENV PORT=3001

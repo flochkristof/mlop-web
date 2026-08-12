@@ -39,7 +39,7 @@ export const auth = betterAuth({
           : "http://localhost:3001/api/auth/callback/google",
     },
   },
-  trustedOrigins: [env.PUBLIC_URL],
+  trustedOrigins: [env.BETTER_AUTH_URL],
   user: {
     additionalFields: {
       finishedOnboarding: {
